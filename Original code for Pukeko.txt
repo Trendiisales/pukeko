@@ -1,0 +1,162 @@
+import React, { useState, useCallback } from 'react';
+
+interface PostContent {
+  facebook: string;
+  twitter: string;
+  linkedin: string;
+  instagram: string;
+}
+
+const SocialMediaPosterTool: React.FC = () => {
+  const [topic, setTopic] = useState<string>('');
+  const [posts, setPosts] = useState<PostContent>({
+    facebook: '',
+    twitter: '',
+    linkedin: '',
+    instagram: '',
+  });
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [isPosting, setIsPosting] = useState<boolean>(false);
+  const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
+
+  const handleGeneratePosts = useCallback(() => {
+    if (!topic.trim()) return;
+
+    setIsGenerating(true);
+    // Simulate API call or generation logic
+    setTimeout(() => {
+      setPosts({
+        facebook: `Check out this interesting finding about "${topic}"! [Link to source] #facebook #topic`,
+        twitter: `"${topic}" is making waves! 🌊 Short insights here. #twitter #news [Link]`,
+        linkedin: `Professional perspective on "${topic}": Exploring the implications for the industry. Let's discuss the impact.\n\n#linkedin #business #${topic.replace(/\s+/g, '')}`,
+        instagram: `Visually exploring "${topic}". What are your thoughts? 🤔 #instagram #visuals #${topic.replace(/\s+/g, '')} #instadaily`,
+      });
+      setIsGenerating(false);
+    }, 1000); // Simulate network delay
+  }, [topic]);
+
+  const handlePostAll = useCallback(() => {
+     setIsPosting(true);
+     // Simulate posting to all platforms
+     setTimeout(() => {
+        setIsPosting(false);
+        setShowConfirmation(true);
+        // Optionally clear fields after posting
+        // setTopic('');
+        // setPosts({ facebook: '', twitter: '', linkedin: '', instagram: '' });
+        setTimeout(() => setShowConfirmation(false), 3000); // Hide confirmation after 3s
+     }, 1500);
+  }, [posts]); // Depend on posts state if needed for actual posting logic
+
+  const handleInputChange = (platform: keyof PostContent, value: string) => {
+    setPosts(prev => ({ ...prev, [platform]: value }));
+  };
+
+  const platformConfig = [
+    { name: 'Facebook', key: 'facebook', charLimit: 5000, color: 'bg-blue-600', placeholder: 'Write your Facebook post here...' },
+    { name: 'X (Twitter)', key: 'twitter', charLimit: 280, color: 'bg-sky-500', placeholder: 'Craft your tweet (max 280 chars)...' },
+    { name: 'LinkedIn', key: 'linkedin', charLimit: 3000, color: 'bg-blue-800', placeholder: 'Compose your LinkedIn update...' },
+    { name: 'Instagram', key: 'instagram', charLimit: 2200, color: 'bg-pink-600', placeholder: 'Write your Instagram caption...' },
+  ] as const; // Use 'as const' for stricter typing of keys
+
+  const canPost = Object.values(posts).some(post => post.trim() !== '');
+
+  return (
+    <div className="p-6 md:p-8 bg-gray-50 min-h-screen font-sans">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Social Media Post Generator</h1>
+
+        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+          <label htmlFor="topicInput" className="block text-sm font-medium text-gray-700 mb-2">
+            Enter Topic (e.g., from Google Search)
+          </label>
+          <textarea
+            id="topicInput"
+            rows={3}
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-gray-900 placeholder-gray-400"
+            placeholder="e.g., 'latest AI developments'"
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+          />
+          <button
+            onClick={handleGeneratePosts}
+            disabled={!topic.trim() || isGenerating}
+            className={`mt-4 w-full sm:w-auto inline-flex justify-center items-center px-6 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white ${
+              !topic.trim() || isGenerating
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+            } transition duration-150 ease-in-out`}
+          >
+            {isGenerating ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Generating...
+              </>
+            ) : (
+              'Generate Post Ideas'
+            )}
+          </button>
+        </div>
+
+        <div className="space-y-6">
+          {platformConfig.map((platform) => (
+            <div key={platform.key} className="bg-white p-6 rounded-lg shadow-md">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className={`text-xl font-semibold ${platform.color.replace('bg-', 'text-')}`}>{platform.name}</h2>
+                <span className="text-sm text-gray-500">
+                  {posts[platform.key].length} / {platform.charLimit} chars
+                </span>
+              </div>
+              <div className="flex flex-col md:flex-row gap-4">
+                <textarea
+                  rows={5}
+                  className="flex-grow p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-gray-900 placeholder-gray-400"
+                  placeholder={platform.placeholder}
+                  value={posts[platform.key]}
+                  onChange={(e) => handleInputChange(platform.key, e.target.value)}
+                  maxLength={platform.charLimit}
+                />
+                <div className="flex-shrink-0 flex flex-col items-center space-y-2">
+                   <span className="text-sm text-gray-600">Add Image</span>
+                   <div className="bg-gray-200 border-2 border-dashed rounded-xl w-24 h-24 flex items-center justify-center text-gray-400 text-xs">Preview</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-8 flex justify-end items-center">
+           {showConfirmation && (
+            <span className="text-green-600 mr-4 transition duration-300 ease-in-out">Posts submitted successfully!</span>
+          )}
+          <button
+            onClick={handlePostAll}
+            disabled={!canPost || isPosting}
+            className={`inline-flex justify-center items-center px-8 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white ${
+              !canPost || isPosting
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500'
+            } transition duration-150 ease-in-out`}
+          >
+             {isPosting ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Posting...
+              </>
+            ) : (
+              'Post to All Platforms'
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SocialMediaPosterTool;
