@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pukeko Social</title>
+  
+  <!-- Inline critical CSS -->
+  <style>
+    /* Basic reset and styling */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      color: #333;
+      background-color: #f9f9f9;
+      padding: 20px;
+    }
+    
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    h1 {
+      font-size: 24px;
+      color: #2c3e50;
+    }
+    
+    .success-message {
+      background-color: #d4edda;
+      color: #155724;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+    
+    .error-message {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+    
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+  </style>
+  
+  <script>
+    // Debug logging for page load
+    console.log('Page loading started');
+    window.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM fully loaded');
+    });
+    window.addEventListener('load', function() {
+      console.log('All resources loaded');
+    });
+  </script>
+</head>
+<body>
+  <main id="app">
+    <header>
+      <h1>Pukeko Social</h1>
+      <div id="nav-placeholder"></div>
+    </header>
+    
+    <div id="status-container"></div>
+    
+    <div class="card">
+      <h2>Welcome to Pukeko Social</h2>
+      <p>This is a simplified version of your application to help identify rendering issues.</p>
+      <p>If you can see this content, then basic HTML rendering is working correctly.</p>
+    </div>
+    
+    <div class="card">
+      <h2>Content Section</h2>
+      <p>This is where your main content would usually appear.</p>
+      <div id="content-placeholder"></div>
+    </div>
+  </main>
+
+  <!-- Firebase SDK - Using version 9 (modular) -->
+  <script type="module">
+    // Add a visible element to show the page is working before Firebase loads
+    document.addEventListener('DOMContentLoaded', function() {
+      const statusContainer = document.getElementById('status-container');
+      if (statusContainer) {
+        statusContainer.innerHTML = `
+          <div class="success-message">
+            <strong>Step 1:</strong> Basic page loaded successfully!
+          </div>
+        `;
+      }
+    });
+    
+    try {
+      // Import Firebase
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+      
+      console.log('Firebase module imported');
+      
+      // Update status
+      const statusContainer = document.getElementById('status-container');
+      if (statusContainer) {
+        statusContainer.innerHTML += `
+          <div class="success-message">
+            <strong>Step 2:</strong> Firebase module imported successfully!
+          </div>
+        `;
+      }
+      
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        projectId: 'pukeko-social'
+        // Add other config options if needed
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      console.log('Firebase initialized successfully');
+      
+      // Update status again
+      if (statusContainer) {
+        statusContainer.innerHTML += `
+          <div class="success-message">
+            <strong>Step 3:</strong> Firebase initialized successfully!
+          </div>
+        `;
+      }
+      
+      // Add content to the placeholder
+      const contentPlaceholder = document.getElementById('content-placeholder');
+      if (contentPlaceholder) {
+        contentPlaceholder.innerHTML = `
+          <p style="margin-top: 15px;">
+            <strong>Everything is working correctly!</strong> You can now start adding your actual 
+            application code and UI components.
+          </p>
+        `;
+      }
+      
+    } catch (error) {
+      console.error('Firebase error:', error);
+      
+      // Show error on page
+      const statusContainer = document.getElementById('status-container');
+      if (statusContainer) {
+        statusContainer.innerHTML += `
+          <div class="error-message">
+            <strong>Error:</strong> ${error.message}
+          </div>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>

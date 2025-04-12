@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pukeko Social Dashboard</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  
+  <!-- Firebase SDK (no auth) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-functions.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-analytics.js"></script>
+  
+  <style>
+    /* Root Variables */
+    :root {
+      --primary-color: #4a86e8;
+      --secondary-color: #6aa84f;
+      --dark-color: #333333;
+      --light-color: #f9f9f9;
+      --danger-color: #e84a5f;
+      --warning-color: #f9dc5c;
+      --success-color: #2ecc71;
+      --border-radius: 8px;
+      --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
+
+    /* General Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f5f8fa;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    header {
+      background-color: #1da1f2;
+      color: white;
+      padding: 15px 0;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo h1 {
+      font-size: 1.5rem;
+      margin-left: 10px;
+    }
+
+    .nav-links ul {
+      display: flex;
+      list-style: none;
+    }
+
+    .nav-links li {
+      margin-left: 20px;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      padding: 5px 10px;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    main {
+      padding: 30px 0;
+    }
+
+    section {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      padding: 25px;
+      margin-bottom: 30px;
+    }
+
+    h2 {
+      color: #1da1f2;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .search-container {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    .search-btn {
+      background-color: #1da1f2;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 0 20px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: background-color 0.3s;
+    }
+
+    .search-btn:hover {
+      background-color: #0d8ed9;
+    }
+
+    .results-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .result-card {
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .result-card img {
+      width: 100%;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    .result-card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 5px;
+    }
+
+    .result-stats {
+      font-size: 0.9rem;
+      color: #666;
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .post-form {
+      background-color: #f0f7ff;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    textarea.form-control {
+      height: 100px;
+      resize: vertical;
+    }
+
+    .platforms-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .platform-checkbox {
+      display: flex;
+      align-items: center;
+      background-color: white;
+      padding: 8px 15px;
+      border-radius: 5px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .platform-checkbox input {
+      margin-right: 8px;
+    }
+
+    .platform-icon {
+      margin: 0 8px;
+      font-size: 1.1rem;
+    }
+
+    .submit-btn {
+      background-color: #1da1f2;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 12px 25px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .submit-btn:hover {
+      background-color: #0d8ed9;
+    }
+
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      text-align: center;
+    }
+
+    .stat-card h3 {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1da1f2;
+    }
+
+    .chart-container {
+      height: 300px;
+      margin-top: 20px;
+    }
+
+    .post-history-list {
+      list-style: none;
+    }
+
+    .post-item {
+      border-bottom: 1px solid #eee;
+      padding: 15px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .post-item:last-child {
+      border-bottom: none;
+    }
+
+    .post-content {
+      flex: 1;
+    }
+
+    .post-content h3 {
+      margin-bottom: 5px;
+      font-size: 1.1rem;
+    }
+
+    .post-meta {
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .post-actions button {
+      background-color: #f0f0f0;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 12px;
+      margin-left: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .post-actions button:hover {
+      background-color: #e0e0e0;
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .settings-card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .settings-card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 15px;
+      color: #1da1f2;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+      margin: 10px 0;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #1da1f2;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    .loading-spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: #1da1f2;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error-message {
+      color: #e74c3c;
+      background-color: #fdecea;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .success-message {
+      color: #27ae60;
+      background-color: #ebf7f0;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .offline-notice {
+      color: #f39c12;
+      background-color: #fef5e7;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .header-container {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .mobile-menu-btn {
+        display: block;
+        position: absolute;
+        top: 15px;
+        right: 20px;
+      }
+      
+      .nav-links {
+        display: none;
+        width: 100%;
+        margin-top: 15px;
+      }
+      
+      .nav-links.active {
+        display: block;
+      }
+      
+      .nav-links ul {
+        flex-direction: column;
+      }
+      
+      .nav-links li {
+        margin: 10px 0;
+        margin-left: 0;
+      }
+      
+      .search-container {
+        flex-direction: column;
+      }
+      
+      .analytics-grid,
+      .settings-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-container">
+      <div class="logo">
+        <img src="https://firebasestorage.googleapis.com/v0/b/pukeko-social.appspot.com/o/pukeko-logo.png?alt=media" alt="Pukeko Logo" style="height: 50px; margin-right: 10px;">
+        <h1>Pukeko Social</h1>
+      </div>
+      <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <i class="fas fa-bars"></i>
+      </button>
+      <nav class="nav-links" id="navLinks">
+        <ul>
+          <li><a href="#search" class="active">Search & Post</a></li>
+          <li><a href="#analytics">Analytics</a></li>
+          <li><a href="#history">Post History</a></li>
+          <li><a href="#settings">Settings</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" id="mainContent">
+    <!-- Search and Post Section -->
+    <section id="search">
+      <h2>Search & Create Posts</h2>
+      
+      <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search for trending topics...">
+        <button id="searchBtn" class="search-btn">Search</button>
+      </div>
+      
+      <div id="loadingSpinner" class="loading-spinner"></div>
+      <div id="errorMessage" class="error-message"></div>
+      
+      <div id="resultsContainer" class="results-container"></div>
+      
+      <div class="post-form">
+        <h3>Create New Post</h3>
+        <div class="form-group">
+          <label for="postTitle">Post Title</label>
+          <input type="text" id="postTitle" class="form-control" placeholder="Enter a catchy title...">
+        </div>
+        
+        <div class="form-group">
+          <label for="postContent">Content</label>
+          <textarea id="postContent" class="form-control" placeholder="What's on your mind?"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label>Select Platforms</label>
+          <div class="platforms-list">
+            <label class="platform-checkbox">
+              <input type="checkbox" name="platform" value="twitter" checked> 
+              <i class="fab fa-twitter" style="margin: 0 8px; color: #1da1f2;"></i> Twitter
+            </label>
+            <label class="platform-checkbox">
+              <input type="checkbox" name="platform" value="facebook" checked> 
+              <i class="fab fa-facebook-f" style="margin: 0 8px; color: #3b5998;"></i> Facebook
+            </label>
+            <label class="platform-checkbox">
+              <input type="checkbox" name="platform" value="instagram" checked> 
+              <i class="fab fa-instagram" style="margin: 0 8px; color: #e1306c;"></i> Instagram
+            </label>
+            <label class="platform-checkbox">
+              <input type="checkbox" name="platform" value="linkedin" checked> 
+              <i class="fab fa-linkedin-in" style="margin: 0 8px; color: #0077b5;"></i> LinkedIn
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="postDateTime">Schedule Post</label>
+          <input type="datetime-local" id="postDateTime" class="form-control">
+        </div>
+        
+        <button id="submitPostBtn" class="submit-btn">Submit Post</button>
+        <div id="successMessage" class="success-message"></div>
+      </div>
+    </section>
+    
+    <!-- Analytics Section -->
+    <section id="analytics">
+      <h2>Analytics Dashboard</h2>
+      
+      <div class="analytics-grid">
+        <div class="stat-card">
+          <h3>Total Posts</h3>
+          <div class="stat-number" id="totalPosts">0</div>
+        </div>
+        
+        <div class="stat-card">
+          <h3>Total Engagement</h3>
+          <div class="stat-number" id="totalEngagement">0</div>
+        </div>
+        
+        <div class="stat-card">
+          <h3>Average Likes</h3>
+          <div class="stat-number" id="avgLikes">0</div>
+        </div>
+        
+        <div class="stat-card">
+          <h3>Best Performing Platform</h3>
+          <div class="stat-number" id="bestPlatform">-</div>
+        </div>
+      </div>
+      
+      <div class="chart-container" id="engagementChart">
+        <!-- Chart will be rendered here -->
+      </div>
+    </section>
+    
+    <!-- Post History Section -->
+    <section id="history">
+      <h2>Post History</h2>
+      
+      <ul class="post-history-list" id="postHistoryList">
+        <!-- Post history items will be loaded here -->
+      </ul>
+    </section>
+    
+    <!-- Settings Section -->
+    <section id="settings">
+      <h2>Account Settings</h2>
+      
+      <div class="settings-grid">
+        <div class="settings-card">
+          <h3>Notifications</h3>
+          
+          <div>
+            <p>Email Notifications</p>
+            <label class="toggle-switch">
+              <input type="checkbox" id="emailNotifToggle" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          
+          <div>
+            <p>Push Notifications</p>
+            <label class="toggle-switch">
+              <input type="checkbox" id="pushNotifToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="settings-card">
+          <h3>Content Preferences</h3>
+          
+          <div>
+            <p>Auto-schedule Posts</p>
+            <label class="toggle-switch">
+              <input type="checkbox" id="autoScheduleToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+          
+          <div>
+            <p>AI Content Suggestions</p>
+            <label class="toggle-switch">
+              <input type="checkbox" id="aiSuggestionsToggle" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="settings-card">
+          <h3>Connected Accounts</h3>
+          
+          <div>
+            <p>Twitter</p>
+            <label class="toggle-switch">
+              <input type="checkbox" id="twitterConnectToggle" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          
+          <div>
+            <p>Facebook</p>
+            <label class="toggle-switch">
+              <input type="checkbox" id="facebookConnectToggle" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          
+          <div>
+            <p>Instagram</p>
+            <label class="toggle-switch">
+              <input type="checkbox" id="instagramConnectToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+          
+          <div>
+            <p>LinkedIn</p>
+            <label class="toggle-switch">
+              <input type="checkbox" id="linkedinConnectToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDPbA6xenomVx7oVG9SgpO9BroCEEAGFPc",
+      authDomain: "pukeko-social.firebaseapp.com",
+      projectId: "pukeko-social",
+      storageBucket: "pukeko-social.appspot.com",
+      messagingSenderId: "264566587944",
+      appId: "1:264566587944:web:6629c54f8e8fd53fba82a8",
+      measurementId: "G-5N5QTN0ZGW"
+    };
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const functions = firebase.functions();
+    const analytics = firebase.analytics();
+    
+    // Set default user ID for public users
+    const publicUserId = "public-user";
+    
+    // DOM Elements
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const navLinks = document.getElementById('navLinks');
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+    const postTitle = document.getElementById('postTitle');
+    const postContent = document.getElementById('postContent');
+    const postDateTime = document.getElementById('postDateTime');
+    const submitPostBtn = document.getElementById('submitPostBtn');
+    const platformCheckboxes = document.querySelectorAll('input[name="platform"]');
+    const postHistoryList = document.getElementById('postHistoryList');
+    const totalPostsEl = document.getElementById('totalPosts');
+    const totalEngagementEl = document.getElementById('totalEngagement');
+    const avgLikesEl = document.getElementById('avgLikes');
+    const bestPlatformEl = document.getElementById('bestPlatform');
+    
+    // Flag to track if we're in offline mode
+    let isOfflineMode = false;
+    
+    // Function to check if we can connect to Firestore
+    function checkFirestoreConnection() {
+      return new Promise((resolve) => {
+        const testRef = db.collection('_connection_test').doc('test');
+        testRef.set({ timestamp: firebase.firestore.FieldValue.serverTimestamp() })
+          .then(() => {
+            isOfflineMode = false;
+            resolve(true);
+          })
+          .catch(error => {
+            console.warn('Firestore connection check failed:', error);
+            isOfflineMode = true;
+            resolve(false);
+          });
+          
+        // Set timeout in case Firestore is completely unreachable
+        setTimeout(() => {
+          isOfflineMode = true;
+          resolve(false);
+        }, 3000);
+      });
+    }
+    
+    // Mobile menu toggle
+    mobileMenuBtn.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+    });
+    
+    // Navigation active state
+    const navItems = document.querySelectorAll('.nav-links a');
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        navItems.forEach(link => link.classList.remove('active'));
+        item.classList.add('active');
+        navLinks.classList.remove('active');
+      });
+    });
+
+    // Make sure all platform checkboxes are visible
+    function ensurePlatformsVisible() {
+      document.querySelectorAll('.platform-checkbox').forEach(label => {
+        label.style.display = 'flex';
+      });
+    }
+    
+    // Search functionality
+    searchBtn.addEventListener('click', performSearch);
+    
+    function performSearch() {
+      const searchTerm = searchInput.value.trim();
+      if (!searchTerm) return;
+      
+      loadingSpinner.style.display = 'block';
+      resultsContainer.innerHTML = '';
+      errorMessage.style.display = 'none';
+      
+      // Track search in analytics
+      try {
+        analytics.logEvent('search', {
+          search_term: searchTerm,
+          user_id: publicUserId
+        });
+      } catch (error) {
+        console.warn('Analytics tracking failed:', error);
+      }
+
+      // Always display mock results to avoid relying on Cloud Function
+      setTimeout(() => {
+        loadingSpinner.style.display = 'none';
+        displayMockResults();
+      }, 500);
+    }
+    
+    function displaySearchResults(results) {
+      if (!results || results.length === 0) {
+        errorMessage.textContent = 'No results found. Try another search term.';
+        errorMessage.style.display = 'block';
+        return;
+      }
+      
+      results.forEach(result => {
+        const resultCard = document.createElement('div');
+        resultCard.className = 'result-card';
+        
+        let platformIcon = '';
+        let platformColor = '';
+        switch(result.platform.toLowerCase()) {
+          case 'twitter':
+            platformIcon = 'fa-twitter';
+            platformColor = '#1da1f2';
+            break;
+          case 'facebook':
+            platformIcon = 'fa-facebook-f';
+            platformColor = '#3b5998';
+            break;
+          case 'instagram':
+            platformIcon = 'fa-instagram';
+            platformColor = '#e1306c';
+            break;
+          case 'linkedin':
+            platformIcon = 'fa-linkedin-in';
+            platformColor = '#0077b5';
+            break;
+          default:
+            platformIcon = '';
+        }
+        
+        const platformHtml = platformIcon ? 
+          `<i class="fab ${platformIcon}" style="margin-right: 4px; color: ${platformColor};"></i> ${result.platform}` : 
+          result.platform;
+        
+        resultCard.innerHTML = `
+          <h3>${result.title}</h3>
+          <p>${result.description}</p>
+          <div class="result-stats">
+            <span>${platformHtml}</span>
+            <span><i class="fas fa-fire"></i> ${result.trending_score}</span>
+          </div>
+          <button class="search-btn" onclick="useThisContent('${encodeURIComponent(result.title)}', '${encodeURIComponent(result.description)}')">Use This</button>
+        `;
+        
+        resultsContainer.appendChild(resultCard);
+      });
+    }
+    
+    // Mock results for development/testing
+    function displayMockResults() {
+      const mockResults = [
+        {
+          title: "New Work From Home Trends",
+          description: "The shift to remote work is creating new challenges and opportunities for businesses.",
+          platform: "Twitter",
+          trending_score: 87
+        },
+        {
+          title: "Eco-Friendly Products Surge",
+          description: "Consumer interest in sustainable products continues to rise in 2024.",
+          platform: "Instagram",
+          trending_score: 92
+        },
+        {
+          title: "AI in Healthcare Advancements",
+          description: "Artificial intelligence is revolutionizing patient care and medical research.",
+          platform: "LinkedIn",
+          trending_score: 78
+        }
+      ];
+      
+      displaySearchResults(mockResults);
+    }
+    
+    // Use search result as content
+    window.useThisContent = function(title, description) {
+      postTitle.value = decodeURIComponent(title);
+      postContent.value = decodeURIComponent(description);
+      
+      // Scroll to post form
+      postTitle.scrollIntoView({ behavior: 'smooth' });
+    };
+    
+    // Handle offline post creation
+    function handleOfflinePostCreation(postData) {
+      loadingSpinner.style.display = 'none';
+      successMessage.textContent = 'Post created in offline mode. It will sync when connection is restored.';
+      successMessage.style.display = 'block';
+        
+      const offlinePosts = JSON.parse(localStorage.getItem('offlinePosts') || '[]');
+      offlinePosts.push({
+        ...postData,
+        id: 'offline-' + Date.now(),
+        createdAt: new Date().toISOString()
+      });
+      localStorage.setItem('offlinePosts', JSON.stringify(offlinePosts));
+        
+      postTitle.value = '';
+      postContent.value = '';
+        
+      loadPostHistory();
+    }
+    
+    // Submit post functionality
+    submitPostBtn.addEventListener('click', submitPost);
+    
+    function submitPost() {
+      const title = postTitle.value.trim();
+      const content = postContent.value.trim();
+      const scheduledTime = postDateTime.value ? new Date(postDateTime.value) : new Date();
+      
+      if (!title || !content) {
+        errorMessage.textContent = 'Please enter both title and content for your post.';
+        errorMessage.style.display = 'block';
+        return;
+      }
+      
+      const selectedPlatforms = [];
+      platformCheckboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+          selectedPlatforms.push(checkbox.value);
+        }
+      });
+      
+      if (selectedPlatforms.length === 0) {
+        errorMessage.textContent = 'Please select at least one platform.';
+        errorMessage.style.display = 'block';
+        return;
+      }
+      
+      loadingSpinner.style.display = 'block';
+      errorMessage.style.display = 'none';
+      successMessage.style.display = 'none';
+      
+      // Prepare post data with the missing comma fixed (analytics block now ends with a comma)
+      const postData = {
+        title: title,
+        content: content,
+        platforms: selectedPlatforms,
+        scheduledFor: firebase.firestore.Timestamp.fromDate(scheduledTime),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        analytics: {
+          views: 0,
+          likes: 0,
+          shares: 0,
+          comments: 0
+        },  // <-- Comma added here
+        status: 'scheduled'
+      };
+      
+      loadingSpinner.style.display = 'block';
+      db.collection('users').doc(publicUserId).collection('posts')
+        .add(postData)
+        .then(docRef => {
+          loadingSpinner.style.display = 'none';
+          successMessage.textContent = 'Post created successfully!';
+          successMessage.style.display = 'block';
+          
+          try {
+            analytics.logEvent('post_created', {
+              post_id: docRef.id,
+              platforms: selectedPlatforms.join(','),
+              user_id: publicUserId
+            });
+          } catch (analyticsError) {
+            console.warn('Analytics tracking failed:', analyticsError);
+          }
+          
+          postTitle.value = '';
+          postContent.value = '';
+          platformCheckboxes.forEach(checkbox => {
+            checkbox.checked = true;
+          });
+          
+          loadPostHistory();
+          loadAnalytics();
+          
+          successMessage.scrollIntoView({ behavior: 'smooth' });
+        })
+        .catch(error => {
+          console.error('Error saving post:', error);
+          alert('Error creating post: ' + error.message);
+        });
+    }
+    
+    // Load post history
+    function loadPostHistory() {
+      postHistoryList.innerHTML = '';
+      
+      const loadingItem = document.createElement('li');
+      loadingItem.textContent = 'Loading post history...';
+      postHistoryList.appendChild(loadingItem);
+      
+      db.collection('users').doc(publicUserId).collection('posts')
+        .orderBy('createdAt', 'desc')
+        .limit(10)
+        .get()
+        .then(snapshot => {
+          postHistoryList.innerHTML = '';
+          
+          if (snapshot.empty) {
+            displayMockPostHistory();
+            return;
+          }
+          
+          snapshot.forEach(doc => {
+            const post = doc.data();
+            createPostHistoryItem(doc.id, post);
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching post history:', error);
+          postHistoryList.innerHTML = '';
+          displayMockPostHistory();
+        });
+    }
+    
+    // Display mock post history
+    function displayMockPostHistory() {
+      const offlinePosts = JSON.parse(localStorage.getItem('offlinePosts') || '[]');
+      
+      const mockPosts = [
+        {
+          id: 'mock1',
+          title: 'Our Latest Product Launch',
+          content: 'Excited to announce our newest product line hitting the shelves next week!',
+          platforms: ['twitter', 'facebook', 'instagram'],
+          createdAt: new Date(Date.now() - 86400000).toISOString(),
+          scheduledFor: new Date(Date.now() + 86400000),
+          status: 'scheduled',
+          analytics: {
+            views: 1245,
+            likes: 89,
+            shares: 32,
+            comments: 14
+          }
+        },
+        {
+          id: 'mock2',
+          title: 'Customer Appreciation Day',
+          content: 'Join us this Friday for exclusive deals and giveaways as we celebrate YOU!',
+          platforms: ['facebook', 'instagram'],
+          createdAt: new Date(Date.now() - 172800000).toISOString(),
+          scheduledFor: new Date(Date.now() - 86400000),
+          status: 'published',
+          analytics: {
+            views: 3567,
+            likes: 241,
+            shares: 68,
+            comments: 47
+          }
+        }
+      ];
+      
+      const allPosts = [...offlinePosts, ...mockPosts];
+      
+      if (allPosts.length === 0) {
+        const emptyItem = document.createElement('li');
+        emptyItem.textContent = 'No posts yet. Create your first post above!';
+        postHistoryList.appendChild(emptyItem);
+      } else {
+        allPosts.forEach(post => {
+          createPostHistoryItem(post.id, post);
+        });
+      }
+    }
+    
+    // Create post history item
+    function createPostHistoryItem(id, post) {
+      const postItem = document.createElement('li');
+      postItem.className = 'post-item';
+      
+      const createdDate = post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Just now';
+      const platformsText = Array.isArray(post.platforms) ? post.platforms.join(', ') : 'Multiple platforms';
+      
+      postItem.innerHTML = `
+        <div class="post-content">
+          <h3>${post.title}</h3>
+          <div class="post-meta">
+            <span>${createdDate}</span> • 
+            <span>${platformsText}</span> • 
+            <span>${post.status}</span>
+          </div>
+        </div>
+        <div class="post-actions">
+          <button onclick="editPost('${id}')"><i class="fas fa-edit"></i></button>
+          <button onclick="deletePost('${id}')"><i class="fas fa-trash"></i></button>
+        </div>
+      `;
+      
+      postHistoryList.appendChild(postItem);
+    }
+    
+    // Edit post functionality
+    window.editPost = function(id) {
+      alert('Edit functionality would open post ' + id);
+      postTitle.scrollIntoView({ behavior: 'smooth' });
+    };
+    
+    // Delete post functionality
+    window.deletePost = function(id) {
+      if (!confirm('Are you sure you want to delete this post?')) return;
+      
+      if (id.startsWith('mock') || id.startsWith('offline')) {
+        document.querySelectorAll('.post-item').forEach(item => {
+          if (item.innerHTML.indexOf(id) !== -1) {
+            item.remove();
+          }
+        });
+        
+        if (id.startsWith('offline')) {
+          const offlinePosts = JSON.parse(localStorage.getItem('offlinePosts') || '[]');
+          const filteredPosts = offlinePosts.filter(post => post.id !== id);
+          localStorage.setItem('offlinePosts', JSON.stringify(filteredPosts));
+        }
+        
+        return;
+      }
+      
+      db.collection('users').doc(publicUserId).collection('posts').doc(id)
+        .delete()
+        .then(() => {
+          loadPostHistory();
+        })
+        .catch(error => {
+          console.error('Error deleting post:', error);
+          alert('Error deleting post. Please try again.');
+        });
+    };
+    
+    // Load analytics data
+    function loadAnalytics() {
+      totalPostsEl.textContent = Math.floor(Math.random() * 50) + 10;
+      totalEngagementEl.textContent = Math.floor(Math.random() * 5000) + 1000;
+      avgLikesEl.textContent = Math.floor(Math.random() * 100) + 20;
+      
+      const platforms = ['Twitter', 'Instagram', 'LinkedIn', 'Facebook'];
+      bestPlatformEl.textContent = platforms[Math.floor(Math.random() * platforms.length)];
+      
+      renderEngagementChart();
+    }
+    
+    // Render engagement chart
+    function renderEngagementChart() {
+      const chartContainer = document.getElementById('engagementChart');
+      chartContainer.innerHTML = `
+        <div style="position: relative; width: 100%; height: 100%;">
+          <img src="https://firebasestorage.googleapis.com/v0/b/pukeko-social.appspot.com/o/mock-chart.png?alt=media" 
+               alt="Engagement Chart" style="width: 100%; height: 100%; object-fit: contain;">
+        </div>
+      `;
+    }
+    
+    // Initialize the app
+    async function initializeApp() {
+      await checkFirestoreConnection();
+      
+      const now = new Date();
+      const offset = now.getTimezoneOffset() * 60000;
+      const localISOTime = (new Date(now - offset)).toISOString().slice(0, 16);
+      postDateTime.value = localISOTime;
+      
+      loadPostHistory();
+      loadAnalytics();
+      
+      searchInput.placeholder = "Try: AI trends, remote work, sustainability...";
+    }
+    
+    initializeApp();
+  </script>
+  
+  <!-- Google GenAI Integration Script - FIXED VERSION WITH PROPER JWT IMPORT -->
+  <script type="module">
+    import { GenerativeLanguage } from 'https://cdn.jsdelivr.net/npm/@google-ai/generativelanguage@latest/+esm';
+    import { JWT } from 'https://cdn.jsdelivr.net/npm/@google-ai/generativelanguage@latest/node_modules/google-auth-library/+esm';
+    
+    function initGenAI() {
+      try {
+        const auth = new JWT({
+          email: 'service-account@pukeko-social.iam.gserviceaccount.com',
+          key: 'PRIVATE_KEY_WOULD_BE_HERE',
+          scopes: ['https://www.googleapis.com/auth/cloud-platform']
+        });
+        const genAI = new GenerativeLanguage({ auth });
+        console.log('GenAI client initialized successfully');
+        return genAI;
+      } catch (error) {
+        console.warn('GenAI initialization failed:', error);
+        return null;
+      }
+    }
+    
+    // const genAIClient = initGenAI();
+  </script>
+</body>
+</html>

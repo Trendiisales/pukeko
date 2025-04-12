@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pukeko Social Dashboard</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-functions.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-analytics.js"></script>
+  
+  <!-- Basic Firebase initialization -->
+  <script>
+    // Initialize Firebase with minimal config
+    firebase.initializeApp({
+      projectId: 'pukeko-social'
+    });
+    console.log('Firebase initialized');
+  </script>
+  
+  <!-- Styles from your original index.html -->
+  <style>
+    /* Root Variables */
+    :root {
+      --primary-color: #4a86e8;
+      --secondary-color: #6aa84f;
+      --dark-color: #333333;
+      --light-color: #f9f9f9;
+      --danger-color: #e84a5f;
+      --warning-color: #f9dc5c;
+      --success-color: #2ecc71;
+      --border-radius: 8px;
+      --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
+
+    /* General Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f5f8fa;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    header {
+      background-color: #1da1f2;
+      color: white;
+      padding: 15px 0;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo h1 {
+      font-size: 1.5rem;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-container">
+      <div class="logo">
+        <i class="fas fa-feather-alt"></i>
+        <h1>Pukeko Social Dashboard</h1>
+      </div>
+    </div>
+  </header>
+  
+  <main class="container">
+    <div id="status">Loading dashboard...</div>
+  </main>
+
+  <script>
+    // Simple script to show the page is working
+    document.getElementById('status').innerHTML = 'Dashboard initialized - Simple version working!';
+  </script>
+</body>
+</html>

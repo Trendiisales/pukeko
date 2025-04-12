@@ -2,6 +2,6 @@
 export const connectorConfig = {
   connector: 'default',
   service: 'fresh-tailwind',
-  location: 'us-central1'
+  location: 'australia-southeast2'
 };
 

@@ -1,0 +1,91 @@
+// fix-all.js
+// Run with: node fix-all.js
+const fs = require("fs");
+const path = require("path");
+
+// Make sure .vscode directory exists
+const vscodeDir = path.join(__dirname, "..", ".vscode");
+if (!fs.existsSync(vscodeDir)) {
+  fs.mkdirSync(vscodeDir, { recursive: true });
+  console.log(`Created ${vscodeDir} directory`);
+}
+
+// Create VS Code settings.json
+const vsCodeSettings = {
+  "editor.insertSpaces": true,
+  "editor.tabSize": 2,
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  }
+};
+
+const settingsPath = path.join(vscodeDir, "settings.json");
+fs.writeFileSync(settingsPath, JSON.stringify(vsCodeSettings, null, 2) + "\n", "utf8");
+console.log(`Created ${settingsPath}`);
+
+// Fix .eslintrc.js - make sure it ends with a newline
+const eslintrcPath = ".eslintrc.js";
+if (fs.existsSync(eslintrcPath)) {
+  let content = fs.readFileSync(eslintrcPath, "utf8");
+  if (!content.endsWith("\n")) {
+    fs.writeFileSync(eslintrcPath, content + "\n", "utf8");
+    console.log(`Fixed ${eslintrcPath} - added final newline`);
+  } else {
+    console.log(`${eslintrcPath} already has a final newline`);
+  }
+} else {
+  console.log(`${eslintrcPath} not found`);
+}
+
+// Fix lib/index.js
+const libIndexPath = "lib/index.js";
+if (fs.existsSync(libIndexPath)) {
+  try {
+    let content = fs.readFileSync(libIndexPath, "utf8");
+    
+    // Fix line endings (CRLF -> LF)
+    content = content.replace(/\r\n/g, "\n");
+    
+    // Fix 1: Change 'const desc' to 'let desc'
+    content = content.replace(/const desc/, "let desc");
+    
+    // Fix 2: Fix brace style issues
+    content = content.replace(/\{ return/, "{\n    return");
+    content = content.replace(/return [^;]+; \}/, (match) => {
+      return match.replace(" }", "\n  }");
+    });
+    
+    // Fix 3: Shorten long lines
+    const lines = content.split("\n");
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].length > 120) {
+        console.log(`Found long line (${lines[i].length} chars): ${lines[i].substring(0, 30)}...`);
+        
+        // Try to break after common delimiters
+        lines[i] = lines[i]
+          .replace(/(.{80,110})(,|\s+and\s+|\s+or\s+|\.\s+|=|\+)/, "$1$2\n    ")
+          .replace(/(.{80,110})(\s+)/, "$1$2\n    ");
+      }
+    }
+    content = lines.join("\n");
+    
+    // Fix 4: Add space after // in comments
+    content = content.replace(/\/\/([^\s])/g, "// $1");
+    
+    // Fix 5: Fix indentation (4 spaces -> 2 spaces)
+    const indentationLines = content.split("\n");
+    const fixedIndentationLines = indentationLines.map(line => {
+      if (line.match(/^    /)) {
+        return line.replace(/^    /, "  ");
+      } else if (line.match(/^      /)) {
+        return line.replace(/^      /, "    ");
+      }
+      return line;
+    });
+    content = fixedIndentationLines.join("\n");
+    
+    // Fix 6: Replace var with const/let
+    content = content.replace(/\bvar\b/g, "const");

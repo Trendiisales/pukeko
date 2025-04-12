@@ -1,12 +1,12 @@
 specVersion: "v1"
 serviceId: "fresh-tailwind"
-location: "us-central1"
+location: "australia-southeast2"
 schema:
   source: "./schema"
   datasource:
     postgresql:
-      database: "fdcdb"
+      database: "postgres"
       cloudSql:
-        instanceId: "fresh-tailwind-fdc"
+        instanceId: "functions-fdc"
       # schemaValidation: "COMPATIBLE"
 connectorDirs: ["./connector"]

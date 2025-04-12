@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Basic Test Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f0f0f0;
+    }
+    .content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin: 0 auto;
+      max-width: 600px;
+    }
+    .message {
+      padding: 10px;
+      background-color: #d4edda;
+      color: #155724;
+      border-radius: 4px;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <h1>Basic Test Page</h1>
+    <div class="message">
+      If you can see this text, basic HTML rendering is working correctly.
+    </div>
+    <p>This is a very simple HTML page with no external dependencies.</p>
+    <p>Current time: <span id="time"></span></p>
+  </div>
+
+  <script>
+    // Simple JavaScript to update the time
+    function updateTime() {
+      document.getElementById('time').textContent = new Date().toLocaleTimeString();
+    }
+    
+    // Run immediately and then every second
+    updateTime();
+    setInterval(updateTime, 1000);
+    
+    // Add a visible message to confirm JavaScript is working
+    document.addEventListener('DOMContentLoaded', function() {
+      const content = document.querySelector('.content');
+      const jsMessage = document.createElement('div');
+      jsMessage.className = 'message';
+      jsMessage.style.backgroundColor = '#cce5ff';
+      jsMessage.style.color = '#004085';
+      jsMessage.textContent = 'JavaScript is working correctly!';
+      content.appendChild(jsMessage);
+    });
+  </script>
+</body>
+</html>

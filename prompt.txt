@@ -1,0 +1,2 @@
+
+i want to use a search term to find information, summarize it according to the rules for these 4 platforms, LinkedIn, X, Facebook and Instagram. The summary should then be posted in each platform according to platform requirements. If the search term finds and image, that image should be saved and used for display in Instagram. I want to not use API's if possible. The App should be modern and vibrant and be used on Mobile or PC.

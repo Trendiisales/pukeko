@@ -11,7 +11,6 @@ firebase-debug.*.log*
 .firebase/
 
 # Firebase config
-
 # Uncomment this if you'd like others to create their own Firebase project.
 # For a team working on the same Firebase project(s), it is recommended to leave
 # it commented so all members can deploy to the same project(s) in .firebaserc.
@@ -67,3 +66,35 @@ node_modules/
 
 # dataconnect generated files
 .dataconnect
+
+# Firebase emulators (explicitly exclude emulator data)
+/.firebase/emulators
+
+# Firebase functions specific ignores
+.runtimeconfig.json
+
+# IDE specific files (VS Code, IntelliJ, etc.) - add more as needed
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Sensitive credential files (VERY IMPORTANT - protect these!)
+credentials.json
+serviceAccountKey.json
+**/secrets/* # Exclude any folder named 'secrets' and its contents, adjust if needed
+
+# Specific environment variable files
+*.env.local
+*.env.development
+*.env.production
+
+#Yarn 
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
